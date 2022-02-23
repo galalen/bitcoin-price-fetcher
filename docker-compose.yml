@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: django_web
+    command: /start
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+      - db
+
+  db:
+    image: postgres:14-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+
+  redis:
+    image: redis:6-alpine
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: celery_worker
+    command: /start-celeryworker
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+      - db
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: celery_beat
+    command: /start-celerybeat
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+      - db
+
+volumes:
+  postgres_data:
