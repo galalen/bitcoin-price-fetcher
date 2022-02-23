@@ -20,7 +20,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'log-prices-every-hour': {
         'task': 'prices.tasks.log_prices',
-        'schedule': crontab(minute='*/1'), # TODO: change to every hour
+        'schedule': crontab(minute='*/60'),
         'args': (),
     },
 }
